@@ -1,0 +1,38 @@
+#!/usr/bin/python3
+import sys
+import subprocess
+
+def check_factor(*args):
+    if len(args) != 3:
+        args = list(args)
+        count = 0
+        num2 = 1
+        for a in args:
+            if count > 1:
+                num2 *= a
+            count += 1
+    else:
+        num2 = args[2]
+
+    num1 = args[1]
+    num = args[0].replace(':', '=')
+
+    result = subprocess.run(["bc", "-lq"], input=f"if({num2} > {num1}) 1 else 0\n", text=True, capture_output=True)
+    if result.stdout.strip() == "1":
+        num1, num2 = num2, num1
+
+    print(f"{num}{num1}*{num2}")
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print('Usage: rsa <file>')
+        sys.exit(1)
+
+    filename = sys.argv[1]
+
+    with open(filename) as f:
+        for line in f:
+            number = line.strip()
+            result = subprocess.run(["factor", number], text=True, capture_output=True)
+            factors = [int(factor) for factor in result.stdout.strip().split()[1:]]
+            check_factor(*factors)
