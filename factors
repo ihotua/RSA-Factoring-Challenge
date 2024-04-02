@@ -1,40 +1,29 @@
 #!/usr/bin/env python3
+
 import sys
-import subprocess
+from math import sqrt
 
-def check_factor(*args):
-    if len(args) != 3:
-        count = 0
-        num2 = 1
-        for a in args:
-            if count > 1:
-                num2 *= int(a)
-            count += 1
-    else:
-        num2 = int(args[2])
+def read_numbers(file_name):
+    with open(file_name, "r") as file:
+        numbers = [int(line.strip()) for line in file]
+    return numbers
 
-    num1 = int(args[1])
-    num = args[0].replace(':', '=')
+def factorize(n):
+    i = 2
+    while i <= sqrt(n):
+        if n % i == 0:
+            print("{} = {} * {}".format(n, i, n // i))
+            return
+        i += 1
+    print("{} = {} * {}".format(n, n, 1))
 
-    if num2 > num1:
-        num1, num2 = num2, num1
-
-    return f"{num}{num1}*{num2}"
-
-def main(filename):
-    try:
-        with open(filename, 'r') as file:
-            for line in file:
-                number = int(line.strip())
-                result = subprocess.run(['factor', str(number)], capture_output=True, text=True)
-                factors = result.stdout.split(':')[1].strip().split()
-                print(check_factor(*factors))
-    except FileNotFoundError:
-        print(f"Error: File '{filename}' not found.")
+def factorize_numbers(numbers):
+    for num in numbers:
+        factorize(num)
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: factors <file>")
+        print("Usage: {} <file>".format(sys.argv[0]))
         sys.exit(1)
-    filename = sys.argv[1]
-    main(filename)
+    numbers = read_numbers(sys.argv[1])
+    factorize_numbers(numbers)
